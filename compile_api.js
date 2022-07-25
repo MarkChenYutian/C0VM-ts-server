@@ -1,8 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
-import crypto from "crypto";
-// import stripAnsi from 'strip-ansi';
+import { randomUUID } from 'crypto';
 import cors from 'cors';
 import { execSync } from "child_process";
 import stripAnsi from "strip-ansi";
@@ -14,33 +13,44 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/compile", (request, response) => {
-    const payload = request.body
-    const md5 = crypto.createHash("md5").update(JSON.stringify(request.body)).digest('hex');
-    let cc0_output = "";
-    fs.writeFileSync(`./cache/${md5}.c0`, payload.code);
+    const session_id = randomUUID();
+    const payload = request.body;
+
+    const contents = payload.code;
+    const flags = payload.flag;
+
+    console.log("Received [POST] on /compile, Session ID =", session_id);
+
     try {
-        cc0_output = execSync(`cc0 -b ./cache/${md5}.c0 -o ./cache/${md5}.bc0 > ./cache/${md5}.output`);
+        fs.mkdirSync(`./cache/${session_id}`);
+        for (let i = 0; i < contents.length; i ++) {
+            fs.writeFileSync(`./cache/${session_id}/${i}.c0`, contents[i]);
+        }
+        let paths = [];
+        for (let i = 0; i < contents.length; i ++) {
+            paths.push(`./cache/${session_id}/${i}.c0`);
+        }
+        execSync(`cc0 -b ${paths.join(" ")} -o ./cache/${session_id}/out.bc0 ${flags["d"] ? "-d" : ""} > ./cache/${session_id}/out.txt`);
+
         response.write(JSON.stringify(
             {
-                bytecode: fs.readFileSync(`./cache/${md5}.bc0`).toString(),
+                bytecode: fs.readFileSync(`./cache/${session_id}/out.bc0`).toString(),
                 c0_output: ""
             }
         ));
-        console.log("Compile Success");
-        fs.unlinkSync(`./cache/${md5}.c0`);
-        fs.unlinkSync(`./cache/${md5}.bc0`);
-        fs.unlinkSync(`./cache/${md5}.output`);
+
+        console.log(session_id, "Compile Success");
+        // fs.unlinkSync(`./cache/${md5}.bc0`);
     } catch (e){
-        console.log("Compile Failed");
+        console.log(session_id, "Compile Failed");
+        console.log(e);
         response.write(JSON.stringify({
             bytecode: "",
-            c0_output: stripAnsi(fs.readFileSync(`./cache/${md5}.output`).toString())
+            c0_output: stripAnsi(fs.readFileSync(`./cache/${session_id}/out.txt`).toString())
         }));
-        fs.unlinkSync(`./cache/${md5}.c0`);
-        fs.unlinkSync(`./cache/${md5}.output`);
-    }
+    } 
+    fs.rmSync(`./cache/${session_id}`, {recursive: true, force: true});
     response.end();
-    console.log("Received [POST] on /compile");
     return response;
 });
 
