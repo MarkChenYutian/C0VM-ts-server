@@ -12,7 +12,7 @@ async def execute_command(program: str, *args: List[str]) -> Tuple[str, str, int
     Return a tuple of form `(stdout, stderr, retval)`
     """
 
-    print(args)
+    print(f"exec: ${program} {' '.join(args)}")
 
     # Create an async subprocess from current process
     child_proc = await asyncio.create_subprocess_exec(

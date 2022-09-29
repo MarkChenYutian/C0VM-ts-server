@@ -37,7 +37,8 @@ async def compile_project(filenames: List[str], codes: List[str], dyn_check: boo
 
         if (dyn_check):
             args.append("-d")
-        args.append("-b")               # set bytecode compiler
+        args.append("--bytecode")               # set bytecode compiler
+        args.append("--bytecode-ext")
         args.append("-o")               # set output file name
         args.append(output_filename)    # set output_file
         args += compile_filenames       # compile files in given order
