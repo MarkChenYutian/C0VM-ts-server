@@ -1,3 +1,3 @@
 #!/bin/sh
 
-uvicorn main:app --host 0.0.0.0 --port 7998
+nohup uvicorn main:app --host 0.0.0.0 --port 7998 &

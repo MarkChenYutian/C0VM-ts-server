@@ -1,15 +1,19 @@
-from sys import stdout
 import uuid
-import asyncio
 
 from typing import List
 from helpers import execute_command, create_workspace, destroy_workspace, path_sanitizer
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 from strip_ansi import strip_ansi
 
 app = FastAPI()
+
+app.mount(
+    "/static", StaticFiles(directory="./static", html=True), name="static"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,7 +22,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.post("/compile")
 async def compile_project(filenames: List[str], codes: List[str], dyn_check: bool):
@@ -37,8 +40,8 @@ async def compile_project(filenames: List[str], codes: List[str], dyn_check: boo
 
         if (dyn_check):
             args.append("-d")
-        args.append("--bytecode")               # set bytecode compiler
-        args.append("--bytecode-ext")
+        args.append("-b")               # set bytecode compiler
+        args.append("--bytecode-ext")   # thanks Iliano & Frank for supporting this project!
         args.append("-o")               # set output file name
         args.append(output_filename)    # set output_file
         args += compile_filenames       # compile files in given order
@@ -48,11 +51,11 @@ async def compile_project(filenames: List[str], codes: List[str], dyn_check: boo
         )
 
         stdout_str = strip_ansi(stdout_str)
-        
+
         if (retval == 0):
             with open(output_filename, "r") as F:
                 bytecode_content = F.read()
-            destroy_workspace(session_id)    
+            destroy_workspace(session_id)
             return {
                 "bytecode": bytecode_content,
                 "error": ""
@@ -63,8 +66,7 @@ async def compile_project(filenames: List[str], codes: List[str], dyn_check: boo
                 "bytecode": "",
                 "error": stdout_str
             }
-        
+
     except Exception as e:
         destroy_workspace(session_id)
         raise e
-
