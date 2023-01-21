@@ -12,7 +12,7 @@ from strip_ansi import strip_ansi
 app = FastAPI()
 
 app.mount(
-    "/static", StaticFiles(directory="./static", html=True), name="static"
+    "/", StaticFiles(directory="./static", html=True), name="static"
 )
 
 app.add_middleware(

@@ -6,7 +6,7 @@ from typing import List, Tuple
 
 async def execute_command(program: str, *args: List[str]) -> Tuple[str, str, int]:
     """
-    Execute command `$ program *args` in an async manner 
+    Execute command `$ program *args` in an async manner
     with subprocess in the background.
 
     Return a tuple of form `(stdout, stderr, retval)`
@@ -34,7 +34,7 @@ async def execute_command(program: str, *args: List[str]) -> Tuple[str, str, int
 
 def path_sanitizer(file_name: str) -> str:
     """
-    Sanitize file names to prevent the file names like "../../../config" 
+    Sanitize file names to prevent the file names like "../../../config"
     being injected to the server
     """
     return file_name.split("/")[-1]
