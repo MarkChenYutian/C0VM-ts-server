@@ -11,10 +11,6 @@ from strip_ansi import strip_ansi
 
 app = FastAPI()
 
-app.mount(
-    "/", StaticFiles(directory="./static", html=True), name="static"
-)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins="*",
@@ -70,3 +66,9 @@ async def compile_project(filenames: List[str], codes: List[str], dyn_check: boo
     except Exception as e:
         destroy_workspace(session_id)
         raise e
+
+
+app.mount(
+    "/", StaticFiles(directory="./static", html=True), name="static"
+)
+
