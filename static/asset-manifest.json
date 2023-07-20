@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/visualc0/static/css/main.088a6ebd.css",
-    "main.js": "/visualc0/static/js/main.4cff70e2.js",
+    "main.css": "/visualc0/static/css/main.4b311d23.css",
+    "main.js": "/visualc0/static/js/main.11868a9c.js",
     "static/media/CascadiaMono.ttf": "/visualc0/static/media/CascadiaMono.d3365ea61baa563ae8df.ttf",
     "static/media/Menlo-Regular.ttf": "/visualc0/static/media/Menlo-Regular.92e41f43900c256f2286.ttf",
     "static/media/tutorial_sorttab.gif": "/visualc0/static/media/tutorial_sorttab.bb610dc15a60e1d9c2a0.gif",
@@ -10,11 +10,11 @@
     "static/media/Tab_Names.png": "/visualc0/static/media/Tab_Names.31f938d8ce6d1d1ea26c.png",
     "static/media/ts-logo-128.svg": "/visualc0/static/media/ts-logo-128.c76204988f8496c480cbab87d1604986.svg",
     "index.html": "/visualc0/index.html",
-    "main.088a6ebd.css.map": "/visualc0/static/css/main.088a6ebd.css.map",
-    "main.4cff70e2.js.map": "/visualc0/static/js/main.4cff70e2.js.map"
+    "main.4b311d23.css.map": "/visualc0/static/css/main.4b311d23.css.map",
+    "main.11868a9c.js.map": "/visualc0/static/js/main.11868a9c.js.map"
   },
   "entrypoints": [
-    "static/css/main.088a6ebd.css",
-    "static/js/main.4cff70e2.js"
+    "static/css/main.4b311d23.css",
+    "static/js/main.11868a9c.js"
   ]
 }
