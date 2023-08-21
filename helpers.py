@@ -37,7 +37,11 @@ def path_sanitizer(file_name: str) -> str:
     Sanitize file names to prevent the file names like "../../../config"
     being injected to the server
     """
-    return file_name.split("/")[-1]
+    BANNED_CHAR = {"&", ";", "|", "\\", "\"", "\'", "*", "$", "`"}
+    for char in BANNED_CHAR:
+        if char in file_name: raise Exception("Invalid file name")
+    
+    return file_name
 
 
 def create_workspace(session_id: str, file_names: List[str], codes: List[str]) -> None:

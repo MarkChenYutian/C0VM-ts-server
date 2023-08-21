@@ -3,7 +3,7 @@ import uuid
 from typing import List
 from helpers import execute_command, create_workspace, destroy_workspace, path_sanitizer
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -65,7 +65,36 @@ async def compile_project(filenames: List[str], codes: List[str], dyn_check: boo
 
     except Exception as e:
         destroy_workspace(session_id)
-        raise e
+        return {
+            "bytecode": "",
+            "error": f"Internal Server Error: {e}"
+        }
+
+
+@app.post("/interface")
+async def get_interface(object_file: UploadFile = File(...)):
+    session_id = str(uuid.uuid4())
+    try:
+        create_workspace(session_id, [], [])    # ./cache/{session_id}
+
+        with open(object_file.filename, 'wb') as f:
+            counter = 0
+            while contents := object_file.file.read(1024 * 1024):
+                f.write(contents)
+                counter += 1
+            if counter > 50: raise Exception("File size too large")
+
+        destroy_workspace(session_id)
+        return {
+            "interface": object_file.filename,
+            "error": ""
+        }
+    except Exception as e:
+        destroy_workspace(session_id)
+        return {
+            "interface": "",
+            "error": f"Internal Server Error: {e}"
+        }
 
 
 app.mount(
