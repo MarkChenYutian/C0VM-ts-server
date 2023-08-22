@@ -1,8 +1,9 @@
 import os
 import shutil
-
+import base64
 import asyncio
 from typing import List, Tuple
+
 
 async def execute_command(program: str, *args: List[str]) -> Tuple[str, str, int]:
     """
@@ -44,15 +45,20 @@ def path_sanitizer(file_name: str) -> str:
     return file_name
 
 
-def create_workspace(session_id: str, file_names: List[str], codes: List[str]) -> None:
+def create_workspace(session_id: str, file_names: List[str], codes: List[str], is_binaries: List[bool]) -> None:
     """
     Initialize the workspace for session
     """
     os.mkdir(f"./cache/{session_id}")
 
-    for file_name, code in zip(file_names, codes):
-        with open(f"./cache/{session_id}/{file_name}", "w") as F:
-            F.write(code)
+    for file_name, code, is_binary in zip(file_names, codes, is_binaries):
+        file_path = f"./cache/{session_id}/{file_name}"
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        if is_binary:
+            with open(file_path, "wb") as F: F.write(base64.b64decode(code.encode()))
+        else:
+            with open(file_path, "w") as F: F.write(code)
     return
 
 def destroy_workspace(session_id: str) -> None:

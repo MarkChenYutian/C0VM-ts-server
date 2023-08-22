@@ -20,14 +20,19 @@ app.add_middleware(
 )
 
 @app.post("/compile")
-async def compile_project(filenames: List[str], codes: List[str], dyn_check: bool):
+async def compile_project(
+    filenames: List[str],
+    codes: List[str],
+    is_binaries: List[bool],
+    dyn_check: bool
+):
     """
     Compile C0 source code to BC0 bytecode
     """
     session_id = str(uuid.uuid4())
     filenames = list(map(path_sanitizer, filenames))
 
-    create_workspace(session_id, filenames, codes)
+    create_workspace(session_id, filenames, codes, is_binaries)
 
     try:
         compile_filenames = list(map(lambda s: f"./cache/{session_id}/" + s, filenames))
@@ -75,7 +80,7 @@ async def compile_project(filenames: List[str], codes: List[str], dyn_check: boo
 async def get_interface(object_file: UploadFile = File(...)):
     session_id = str(uuid.uuid4())
     try:
-        create_workspace(session_id, [], [])    # ./cache/{session_id}
+        create_workspace(session_id, [], [], [])    # ./cache/{session_id}
 
         with open(object_file.filename, 'wb') as f:
             counter = 0
