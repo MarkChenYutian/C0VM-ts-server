@@ -77,21 +77,19 @@ async def compile_project(
 
 
 @app.post("/interface")
-async def get_interface(object_file: UploadFile = File(...)):
+async def get_interface(content: str):
     session_id = str(uuid.uuid4())
     try:
-        create_workspace(session_id, [], [], [])    # ./cache/{session_id}
+        create_workspace(session_id, ["a.o0"], [content], [True])    # ./cache/{session_id}
 
-        with open(object_file.filename, 'wb') as f:
-            counter = 0
-            while contents := object_file.file.read(1024 * 1024):
-                f.write(contents)
-                counter += 1
-            if counter > 50: raise Exception("File size too large")
+        output_filename = f"./cache/{session_id}/a.o0"
+        stdout_str, stderr_str, retval = await execute_command(
+            "cc0", "-i", output_filename
+        )
 
         destroy_workspace(session_id)
         return {
-            "interface": object_file.filename,
+            "interface": f"/* Interface resolved by remote server */\n\n" + stdout_str,
             "error": ""
         }
     except Exception as e:
