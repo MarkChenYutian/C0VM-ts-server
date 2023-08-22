@@ -76,22 +76,29 @@ async def compile_project(
         }
 
 
-@app.post("/interface")
+@app.get("/interface")
 async def get_interface(content: str):
     session_id = str(uuid.uuid4())
     try:
-        create_workspace(session_id, ["a.o0"], [content], [True])    # ./cache/{session_id}
+        create_workspace(session_id, ["input.o0"], [content], [True])    # ./cache/{session_id}
 
-        output_filename = f"./cache/{session_id}/a.o0"
+        output_filename = f"./cache/{session_id}/input.o0"
         stdout_str, stderr_str, retval = await execute_command(
             "cc0", "-i", output_filename
         )
 
         destroy_workspace(session_id)
-        return {
-            "interface": f"/* Interface resolved by remote server */\n\n" + stdout_str,
-            "error": ""
-        }
+
+        if retval == 0:
+            return {
+                "interface": f"/* Interface resolved by remote server */\n\n" + stdout_str,
+                "error": ""
+            }
+        else:
+            return {
+                "interface": "",
+                "error": f"/* Interface resolve failed! */\n\n" + stdout_str
+            }
     except Exception as e:
         destroy_workspace(session_id)
         return {
