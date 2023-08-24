@@ -1,9 +1,10 @@
+import os
 import uuid
 
 from typing import List
 from helpers import execute_command, create_workspace, destroy_workspace, path_sanitizer
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -97,7 +98,50 @@ async def get_interface(content: str):
         else:
             return {
                 "interface": "",
-                "error": f"/* Interface resolve failed! */\n\n" + stdout_str
+                "error": f"/* Interface resolve failed or the object file does not have interface exposed! */\n\n" + stdout_str
+            }
+    except Exception as e:
+        destroy_workspace(session_id)
+        return {
+            "interface": "",
+            "error": f"Internal Server Error: {e}"
+        }
+
+
+@app.get("/decode")
+async def get_content(content: str):
+    session_id = str(uuid.uuid4())
+    try:
+        create_workspace(session_id, ["input.o0"], [content], [True])    # ./cache/{session_id}
+
+        output_filename = f"./cache/{session_id}/input.o0"
+        await execute_command(
+            "tar", "-xfz", output_filename, "-C", f"./cache/{session_id}"
+        )
+
+        decompress_path = f"./cache/{session_id}/.tmp0/"
+        decompress_exist = os.path.exists(decompress_path)
+        if not decompress_exist: raise Exception("Failed to decompress object file!")
+
+        content = None
+
+        for result in os.listdir(decompress_path):
+            if (os.path.isfile(result)): continue
+            print("Decompress result:", result)
+            with open(result, "r") as f:
+                content = f.read()
+
+        destroy_workspace(session_id)
+
+        if content is None:
+            return {
+                "result": "",
+                "error": "/* Failed to retrieve decoded content from the object file */"
+            }
+        else:
+            return {
+                "result": content,
+                "error": ""
             }
     except Exception as e:
         destroy_workspace(session_id)
