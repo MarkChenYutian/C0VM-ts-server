@@ -1,4 +1,5 @@
 import os
+import glob
 import uuid
 
 from typing import List
@@ -116,20 +117,28 @@ async def get_content(content: str):
 
         output_filename = f"./cache/{session_id}/input.o0"
         await execute_command(
-            "tar", "-xfz", output_filename, "-C", f"./cache/{session_id}"
+            "mkdir", f"./cache/{session_id}/_c0vm_internal_cache"
+        )
+        await execute_command(
+            "tar", "xfz", output_filename, "-C", f"./cache/{session_id}/_c0vm_internal_cache"
         )
 
-        decompress_path = f"./cache/{session_id}/.tmp0/"
-        decompress_exist = os.path.exists(decompress_path)
-        if not decompress_exist: raise Exception("Failed to decompress object file!")
+        decompressed_c0 = glob.glob(f"./cache/{session_id}/_c0vm_internal_cache/**/*.c0")
+        decompressed_c1 = glob.glob(f"./cache/{session_id}/_c0vm_internal_cache/**/*.c1")
+        
+        for result in decompressed_c0 + decompressed_c1:
+            print(result)
+        
+        # decompress_exist = os.path.exists(decompress_path)
+        # if not decompress_exist: raise Exception("Failed to decompress object file!")
 
         content = None
 
-        for result in os.listdir(decompress_path):
-            if (os.path.isfile(result)): continue
-            print("Decompress result:", result)
-            with open(result, "r") as f:
-                content = f.read()
+        # for result in os.listdir(decompress_path):
+        #     if (os.path.isfile(result) or result.endswith("o0") or result.endswith("o1")): continue
+        #     print("Decompress result:", result)
+        #     with open(result, "r") as f:
+        #         content = f.read()
 
         destroy_workspace(session_id)
 
@@ -140,7 +149,7 @@ async def get_content(content: str):
             }
         else:
             return {
-                "result": content,
+                "interface": content,
                 "error": ""
             }
     except Exception as e:
