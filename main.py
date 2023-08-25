@@ -1,5 +1,4 @@
-import os
-import glob
+from pathlib import Path
 import uuid
 
 from typing import List
@@ -123,8 +122,14 @@ async def get_content(content: str):
             "tar", "xfz", output_filename, "-C", f"./cache/{session_id}/_c0vm_internal_cache"
         )
 
-        decompressed_c0 = glob.glob(f"./cache/{session_id}/_c0vm_internal_cache/**/*.c0", recursive=True)
-        decompressed_c1 = glob.glob(f"./cache/{session_id}/_c0vm_internal_cache/**/*.c1", recursive=True)
+        decompressed_c0 = [
+            c0_ref
+            for c0_ref in Path(".", "cache", session_id, "_c0vm_internal_cache").glob("**/*.c0")
+        ]
+        decompressed_c1 = [
+            c1_ref
+            for c1_ref in Path(".", "cache", session_id, "_c0vm_internal_cache").glob("**/*.c1")
+        ]
         
         content = None
         for result in decompressed_c0 + decompressed_c1:
@@ -140,13 +145,13 @@ async def get_content(content: str):
             }
         else:
             return {
-                "interface": content,
+                "result": content,
                 "error": ""
             }
     except Exception as e:
         destroy_workspace(session_id)
         return {
-            "interface": "",
+            "result": "",
             "error": f"Internal Server Error: {e}"
         }
 
