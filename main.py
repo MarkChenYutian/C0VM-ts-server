@@ -124,17 +124,18 @@ async def get_content(content: str):
 
         decompressed_c0 = [
             c0_ref
-            for c0_ref in Path(".", "cache", session_id, "_c0vm_internal_cache").glob("**/*.c0")
+            for c0_ref in Path(".", "cache", session_id).glob("**/*.c0")
         ]
         decompressed_c1 = [
             c1_ref
-            for c1_ref in Path(".", "cache", session_id, "_c0vm_internal_cache").glob("**/*.c1")
+            for c1_ref in Path(".", "cache", session_id).glob("**/*.c1")
         ]
         
         content = None
         for result in decompressed_c0 + decompressed_c1:
-            with open(result, "r") as f: content = f.read()
-            break
+            if result.is_file():
+                with open(result, "r") as f: content = f.read()
+                break
 
         destroy_workspace(session_id)
 
