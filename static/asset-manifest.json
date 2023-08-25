@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/visualc0/static/css/main.4a64450e.css",
-    "main.js": "/visualc0/static/js/main.8aa1f0f0.js",
+    "main.js": "/visualc0/static/js/main.bff09e35.js",
     "static/media/CascadiaMono.ttf": "/visualc0/static/media/CascadiaMono.d3365ea61baa563ae8df.ttf",
     "static/media/Menlo-Regular.ttf": "/visualc0/static/media/Menlo-Regular.92e41f43900c256f2286.ttf",
     "static/media/tutorial_sorttab.gif": "/visualc0/static/media/tutorial_sorttab.bb610dc15a60e1d9c2a0.gif",
@@ -13,6 +13,6 @@
   },
   "entrypoints": [
     "static/css/main.4a64450e.css",
-    "static/js/main.8aa1f0f0.js"
+    "static/js/main.bff09e35.js"
   ]
 }
